@@ -1,0 +1,31 @@
+# Compiled Object files
+*.o
+*.ko
+*.mod
+*.mod.c
+*.order
+*.symvers
+.tmp_versions/
+*.dwo
+*.su
+
+# Executables
+hotel_booking
+*.out
+*.exe
+
+# Build directory
+build/
+
+# Backup archives
+data/*.tar.gz
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# OS specific files
+.DS_Store
+Thumbs.db
