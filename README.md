@@ -1,324 +1,381 @@
-# Hotel Booking Management System Using C++17 and Linux System Programming
+# Hotel Booking Management System
 
-[![Language](https://img.shields.io/badge/Language-C%2B%2B17%20%7C%20C-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B17)
-[![Platform](https://img.shields.io/badge/Platform-Linux%20%28Ubuntu%29-orange.svg)](https://ubuntu.com)
-[![Standard](https://img.shields.io/badge/Standard-POSIX-green.svg)](https://pubs.opengroup.org/onlinepubs/9699919799/)
-[![License](https://img.shields.io/badge/License-MIT-brightgreen.svg)](LICENSE)
+A simple **console-based Hotel Booking Management System** developed in
+**C++17** using Object-Oriented Programming and file handling.
 
----
+## 1. Project Overview
 
-## 1. Project Title
-**Hotel Booking Management System Using C++ and Linux System Programming**  
-*A Capstone Project demonstrating C++17 Object-Oriented Software Architecture, POSIX Systems Programming, Inter-Process Communication, and Linux Character Device Drivers.*
+The Hotel Booking Management System provides a menu-driven way to manage
+hotel rooms, customers, bookings, cancellations, and bills.
 
----
+The project is designed as an academic C++ project to demonstrate:
 
-## 2. Project Overview
-The **Hotel Booking Management System** is a robust, modular, and performant Command-Line Interface (CLI) application developed exclusively for Linux operating systems. Designed for evaluation in an academic viva and demonstration setting, the project bridges the gap between high-level business software engineering and low-level Linux systems programming.
+-   Object-Oriented Programming
+-   Classes and objects
+-   Encapsulation
+-   Vectors
+-   File handling
+-   Basic authentication
+-   Booking and room-status management
 
-It provides complete hotel inventory management, customer profiling, reservation handling, check-in/out workflows, and automated invoice calculation, while natively implementing core POSIX concepts:
-- **Discretionary Access Control (`chmod 0600`)** on sensitive guest files.
-- **Multithreading (`std::thread`, `std::mutex`)** separating the interactive menu from a background telemetry worker.
-- **Inter-Process Communication (IPC)** via POSIX Named Pipes (FIFO `/tmp/hotel_stats_fifo`).
-- **Process Creation (`fork()`, `exec()`, `waitpid()`)** for automated data backups.
-- **Linux Character Device Driver** module (`/dev/hotel_status`) demonstrating user-to-kernel boundary interaction.
+The application runs through a terminal/console and does not require a
+database.
 
----
+## 2. Main Features
 
-## 3. Problem Statement
-Commercial hotel applications often require hefty external database engines and browser runtimes, making them poorly suited for lightweight embedded Linux terminals, point-of-sale (POS) systems, or environments where real-time OS-level telemetry and security controls are critical. Furthermore, standard academic projects often implement basic CRUD operations without demonstrating systems programming concepts. 
+### Customer Features
 
-This project solves this by delivering an end-to-end, zero-dependency, crash-resilient hotel management solution engineered directly on top of the Linux kernel and POSIX API.
+-   Customer registration
+-   Customer login
+-   View available rooms
+-   Book a room
+-   View personal bookings
+-   Cancel a booking
+-   View bill
+-   Logout
 
----
+### Admin Features
 
-## 4. Objectives
-1. **Core Business Automation**: Manage rooms, guest identities, reservation life cycles, check-in, check-out, and tax invoicing.
-2. **Systems Programming Rigor**: Showcase POSIX file permissions, multithreaded concurrency with mutex synchronization, signal handling, and process management.
-3. **External Inter-Process Telemetry**: Enable external daemons to read live occupancy metrics using a Linux Named Pipe without disturbing front-desk operators.
-4. **Kernel-Space Demonstration**: Provide a dedicated Linux Character Device Driver module to explain Virtual File System (VFS) operations (`open`, `read`, `write`, `release`) and user-kernel memory isolation (`copy_to_user`, `copy_from_user`).
-5. **Academic Viva Readiness**: Designed for an effortless, impressive **5–10 minute viva demonstration** with pre-populated demo sample data.
+-   Admin login
+-   View all rooms
+-   Add a room
+-   Remove an available room
+-   View all bookings
+-   Logout
 
----
+## 3. Technologies Used
 
-## 5. Features
-- **Room Management**: Add, update, delete, view, and search rooms across 4 classes (`Single`, `Double`, `Deluxe`, `Suite`) with dynamic state tracking (`Available`, `Reserved`, `Occupied`, `Maintenance`).
-- **Guest Management**: Registration, profile updates, and search by Name, Phone, or Government ID.
-- **Booking Management**: Intelligent booking engine preventing double-bookings and over-capacity allocations.
-- **Fast Check-In & Check-Out**: Real-time status transitions with itemized add-on billing (dining, laundry, spa, transit).
-- **Billing & Invoicing**: Automated calculation of nights, room rates, services, and 12% statutory taxes.
-- **Data Persistence**: File-backed storage with automatic serialization and deserialization.
-- **Live Statistics & IPC Stream**: Real-time room counts streamed to `/tmp/hotel_stats_fifo`.
-- **System Audit Logging**: Thread-safe logging to `data/hotel.log` stamped with ISO dates, log levels, and thread IDs.
-- **Automated Data Backup**: Uses `fork()` and `tar` to produce compressed `.tar.gz` archives.
-- **Linux Kernel Device Driver**: Direct interaction with `/dev/hotel_status`.
+  Technology       Purpose
+  ---------------- ----------------------------------------------
+  C++17            Application development
+  OOP              Organizing the system into classes
+  `vector`         Storing rooms, guests and bookings in memory
+  `ifstream`       Reading saved data
+  `ofstream`       Writing saved data
+  `getline()`      Reading file/input lines
+  `stringstream`   Parsing comma-separated records
+  GCC/G++          Compiling the project
 
----
+## 4. Project Structure
 
-## 6. Technologies Used
-- **Programming Languages**: C++17 (Application Core), C (Linux Kernel Module).
-- **Operating System**: Linux (Ubuntu 20.04 / 22.04 / 24.04 LTS recommended).
-- **Build System**: GNU Make.
-- **Compiler**: GCC / G++ (v9.0 or later).
-- **Concurrency**: POSIX threads (`pthread`, `std::thread`, `std::mutex`).
-- **IPC Mechanism**: POSIX Named Pipe (FIFO).
-- **Kernel Subsystem**: Linux Virtual File System (VFS), Misc Device Subsystem.
-
----
-
-## 7. Linux Concepts Used
-| Concept | Code File | Purpose & Explanation |
-|---|---|---|
-| **File Permissions (`chmod`)** | `src/FileManager.cpp` | Enforces `0600` permissions on `guests.dat` to protect confidential guest data from unauthorized users. |
-| **Multithreading** | `src/HotelSystem.cpp` | Separates user CLI interactions from an asynchronous background monitoring thread. |
-| **Mutex Locks (`std::mutex`)** | `src/Logger.cpp`, `src/HotelSystem.cpp` | RAII mutex locks (`std::lock_guard`) eliminate race conditions and guarantee thread safety. |
-| **Process Lifecycle (`fork`/`exec`)** | `src/FileManager.cpp` | Child process created via `fork()` transforms into `tar` using `execlp()` while parent waits via `waitpid()`. |
-| **Named Pipe / FIFO** | `src/HotelSystem.cpp` | Inter-Process Communication at `/tmp/hotel_stats_fifo` allows external processes to stream live metrics. |
-| **Signal Handling** | `src/main.cpp` | Traps `SIGINT` (Ctrl+C) and `SIGTERM` to perform an orderly data flush before exit. |
-| **Character Device Driver** | `driver/hotel_status_driver.c` | Virtual device `/dev/hotel_status` exchanging metrics across user/kernel boundary. |
-
----
-
-## 8. System Architecture
-
-```text
-+-----------------------------------------------------------------------------+
-|                                USER SPACE                                   |
-|                                                                             |
-|   +---------------------------------------------------------------------+   |
-|   |                       Main CLI Terminal Menu                        |   |
-|   +---------------------------------------------------------------------+   |
-|                                      |                                      |
-|                                      v                                      |
-|   +---------------------------------------------------------------------+   |
-|   |                   HotelSystem Facade Controller                     |   |
-|   |      (Manages Rooms, Guests, Bookings, Billing, & Synchronization)   |   |
-|   +---------------------------------------------------------------------+   |
-|           |                          |                         |            |
-|           v                          v                         v            |
-|    +--------------+           +--------------+          +--------------+    |
-|    |  Room Engine |           | Guest Engine |          | Booking/Bill |    |
-|    +--------------+           +--------------+          +--------------+    |
-|           |                          |                         |            |
-|           +--------------------------+-------------------------+            |
-|                                      |                                      |
-|                     +----------------+----------------+                     |
-|                     |                                 |                     |
-|                     v                                 v                     |
-|        +-------------------------+       +-------------------------+        |
-|        |     FileManager (POSIX) |       |  Thread-Safe Logger     |        |
-|        | (chmod 0600, fork/tar)  |       |  (Mutex Guarded)        |        |
-|        +-------------------------+       +-------------------------+        |
-|                     |                                 |                     |
-|                     v                                 v                     |
-|           data/*.dat (Storage)                data/hotel.log                |
-|                                                                             |
-|                     +---------------------------------+                     |
-|                     | Background Worker (std::thread) |                     |
-|                     +---------------------------------+                     |
-|                                     |                                       |
-|                +--------------------+--------------------+                  |
-|                |                                         |                  |
-|                v                                         v                  |
-|    [ POSIX FIFO: /tmp/hotel_stats_fifo ]     [ Character Device: /dev/hotel_status ]
-+----------------|-----------------------------------------|------------------+
-                 v                                         v
-       (External terminal)                     +=======================+
-                                               |     KERNEL SPACE      |
-                                               | hotel_status_driver.ko|
-                                               |  - copy_to_user()     |
-                                               |  - copy_from_user()   |
-                                               +=======================+
-```
-
----
-
-## 9. Project Structure
-
-```text
+``` text
 hotel-booking-system/
-├── Makefile                     # Root build configuration
-├── LICENSE                      # MIT Open-Source License
-├── README.md                    # Comprehensive master documentation
-├── .gitignore                   # Git artifact exclusion rules
-├── src/                         # Application source and header files
-│   ├── main.cpp                 # CLI menu and signal handlers
-│   ├── HotelSystem.h            # Central controller facade
+│
+├── src/
+│   ├── main.cpp
 │   ├── HotelSystem.cpp
-│   ├── Room.h                   # Room entity declaration
+│   ├── HotelSystem.h
 │   ├── Room.cpp
-│   ├── Guest.h                  # Guest entity declaration
+│   ├── Room.h
 │   ├── Guest.cpp
-│   ├── Booking.h                # Booking lifecycle entity
+│   ├── Guest.h
 │   ├── Booking.cpp
-│   ├── Billing.h                # Tariff and tax calculations
+│   ├── Booking.h
 │   ├── Billing.cpp
-│   ├── FileManager.h            # POSIX filesystem manager
-│   ├── FileManager.cpp
-│   ├── Logger.h                 # Thread-safe logging singleton
-│   └── Logger.cpp
-├── data/                        # Persistent storage directory
-│   ├── rooms.dat                # Delimited room records
-│   ├── guests.dat               # Secured guest records (chmod 0600)
-│   ├── bookings.dat             # Active and past reservations
-│   └── hotel.log                # Real-time system audit log
-├── driver/                      # Linux Kernel Character Device Module
-│   ├── hotel_status_driver.c    # Character driver implementation
-│   ├── Makefile                 # Kernel module build script
-│   └── README.md                # Driver architectural documentation
-├── docs/                        # Complete technical and viva guides
-│   ├── architecture.md          # Architectural deep-dive
-│   ├── installation.md          # Build and deployment instructions
-│   ├── user-guide.md            # Interactive CLI user manual
-│   ├── linux-concepts.md        # Detailed Linux OS concepts explanation
-│   ├── device-driver.md         # Kernel module documentation
-│   ├── viva-questions.md        # 35 likely viva questions and answers
-│   └── presentation.md          # 10-slide presentation and speech script
-└── tests/
-    └── test_cases.md            # Functional & system test matrices
+│   └── Billing.h
+│
+├── data/
+│   └── (project data directory)
+│
+├── tests/
+│   └── test_cases.md
+│
+├── rooms.dat
+├── guests.dat
+├── bookings.dat
+├── README.md
+├── LICENSE
+├── Makefile
+└── .gitignore
 ```
 
----
+## 5. Class Design
 
-## 10. Installation
-Ensure an Ubuntu/Debian environment with essential build utilities:
+### `Room`
 
-```bash
-sudo apt update
-sudo apt install -y build-essential linux-headers-$(uname -r) git
+Stores information about a hotel room:
+
+-   Room number
+-   Room type
+-   Price per night
+-   Capacity
+-   Room status
+
+Example room types:
+
+-   Standard
+-   Deluxe
+-   Suite
+
+### `Guest`
+
+Stores customer information:
+
+-   Guest ID
+-   Name
+-   Phone
+-   Email
+-   Address
+-   Username
+-   Password
+
+### `Booking`
+
+Stores reservation information:
+
+-   Booking ID
+-   Guest ID
+-   Room number
+-   Check-in date
+-   Check-out date
+-   Number of guests
+-   Booking status
+-   Total amount
+
+### `HotelSystem`
+
+Acts as the main controller of the application.
+
+It manages:
+
+-   Rooms
+-   Guests
+-   Bookings
+-   Registration
+-   Login
+-   Room management
+-   Booking creation
+-   Booking cancellation
+-   Billing
+
+### `Billing`
+
+Provides billing-related functionality used by the booking system.
+
+## 6. File Handling
+
+The project uses files instead of a database for persistent storage.
+
+The current application uses:
+
+``` text
+rooms.dat
+guests.dat
+bookings.dat
 ```
 
----
+`ofstream` is used to save data, while `ifstream` is used to load data
+when the application starts.
 
-## 11. Compilation
-Build the complete project using GNU Make:
+The application uses `getline()` and `stringstream` to read and parse
+stored records.
 
-```bash
-cd hotel-booking-system
-make
+This allows room, guest and booking information to remain available
+after the program is closed and opened again.
+
+## 7. Application Flow
+
+``` text
+Start Program
+      |
+      v
+Main Menu
+      |
+      +-------------------+
+      |                   |
+      v                   v
+Customer              Admin
+      |                   |
+      v                   v
+Register/Login       Admin Login
+      |
+      v
+Customer Menu
+      |
+      +--> View Rooms
+      |
+      +--> Book Room
+      |
+      +--> My Bookings
+      |
+      +--> Cancel Booking
+      |
+      +--> View Bill
+      |
+      +--> Logout
 ```
 
----
+## 8. Booking Workflow
 
-## 12. Execution
-Run the compiled binary:
+1.  Customer logs in.
+2.  Customer views available rooms.
+3.  Customer selects a room.
+4.  Customer enters check-in and check-out dates.
+5.  Customer enters the number of guests.
+6.  The system checks room availability.
+7.  A booking ID is generated.
+8.  The booking is stored.
+9.  The room status changes to `RESERVED`.
+10. Booking information is saved to the data file.
 
-```bash
-./hotel_booking
+## 9. Room Management
+
+The initial system provides five rooms:
+
+  Room   Type         Price   Capacity
+  ------ ---------- ------- ----------
+  101    Standard     \$100          2
+  102    Standard     \$100          2
+  201    Deluxe       \$150          3
+  202    Deluxe       \$150          3
+  301    Suite        \$250          4
+
+Room status can be:
+
+``` text
+AVAILABLE
+RESERVED
 ```
 
----
+## 10. Billing
 
-## 13. Device Driver Setup
-To compile, load, and test the Linux Character Device Driver:
+The current billing calculation applies a **12% tax** to the room
+subtotal.
 
-```bash
-# Compile the driver module
-make driver
+Conceptually:
 
-# Insert the module into the Linux kernel
-sudo insmod driver/hotel_status_driver.ko
-
-# Verify module insertion and device node
-lsmod | grep hotel_status
-ls -l /dev/hotel_status
-
-# Read live metrics from the kernel buffer
-cat /dev/hotel_status
-
-# Remove module after testing
-sudo rmmod hotel_status_driver
+``` text
+Subtotal = Price per night × Number of nights
+Tax      = Subtotal × 12%
+Total    = Subtotal + Tax
 ```
 
----
+> Note: In the current implementation, the night-calculation function is
+> simplified and currently returns one night. Date-based night
+> calculation can be added as a future enhancement.
 
-## 14. Sample Usage
-Upon launching the CLI menu:
-1. Select `11` to load the built-in demo dataset.
-2. Select `1` $\rightarrow$ `1` to view loaded rooms.
-3. Select `3` $\rightarrow$ `2` to create a new reservation.
-4. Select `4` to check in the guest (Room state updates to `Occupied`).
-5. Select `5` to check out the guest, add laundry/dining charges, and generate the final bill.
-6. Select `7` to inspect live occupancy statistics.
-7. Open a separate terminal and run `cat /tmp/hotel_stats_fifo` to view the IPC stream!
+## 11. Admin Login
 
----
+The current application uses the following demo administrator
+credentials:
 
-## 15. Testing
-The project includes a comprehensive test suite documented in [tests/test_cases.md](tests/test_cases.md).
-To run basic functional tests:
-```bash
-# 1. Clean build verification
-make clean && make
-
-# 2. Verify file permissions
-ls -l data/guests.dat
-# Expected: -rw------- (0600)
-
-# 3. Verify process backup
-# Inside application: choose Option 10
-tar -ztvf data/hotel_backup.tar.gz
+``` text
+Username: admin
+Password: admin123
 ```
 
----
+For a production application, administrator credentials should be stored
+securely rather than hard-coded.
 
-## 16. Expected Output
+## 12. How to Compile
 
-### Invoice Output (Check-Out)
-```text
-=======================================================
-                  HOTEL INVOICE / RECEIPT              
-=======================================================
- Booking Reference ID : 1001
- Guest Name           : Alice Johnson
- Contact Phone        : +1-555-0101
- Room Number & Type   : Room #201 (Double)
- Duration of Stay     : 2026-10-10 to 2026-10-13 (3 nights)
- Number of Occupants  : 2
--------------------------------------------------------
- Item Description                 Rate/Cost      Total
--------------------------------------------------------
- Room Tariff ( 3 nights @ $120.00)     $  360.00
- Service: Airport Shuttle                      $   40.00
--------------------------------------------------------
- Subtotal:                                      $  400.00
- Hotel Tax (12%):                               $   48.00
-=======================================================
- FINAL AMOUNT DUE / PAID:                       $  448.00
-=======================================================
+From the project root:
+
+### Windows PowerShell
+
+``` powershell
+g++ -std=c++17 src/main.cpp src/HotelSystem.cpp src/Room.cpp src/Guest.cpp src/Booking.cpp -o hotel.exe
 ```
 
----
+Run:
 
-## 17. Limitations
-- **CLI Interface**: Designed strictly for terminal environments; does not offer a graphical desktop or web browser interface.
-- **Local Filesystem Persistence**: Uses delimited text files rather than distributed database clusters.
-- **Single-Node Execution**: Intended to run on a single Linux host machine.
-
----
-
-## 18. Future Enhancements
-1. **Network Sockets**: Implement a POSIX BSD socket server allowing multiple remote front-desk terminals to connect concurrently.
-2. **ACID Transaction Engine**: Integrate an embedded SQLite3 or LMDB database engine for atomic transactions.
-3. **Hardware Keycard Dispenser Driver**: Expand the character driver to control a physical smart-card hardware reader.
-
----
-
-## 19. GitHub Repository Instructions
-To push this project to your GitHub account:
-
-```bash
-git init
-git add .
-git commit -m "Initial commit: Complete Hotel Booking Management System (Linux/C++17)"
-git branch -M main
-git remote add origin https://github.com/<your-username>/hotel-booking-system.git
-git push -u origin main
+``` powershell
+.\hotel.exe
 ```
 
----
+### Linux / Ubuntu
 
-## 20. Team & Author Information
-- **Project**: Capstone Project - Operating Systems & Systems Programming
-- **Technology Stack**: C++17, C, Linux POSIX API, Linux Kernel 5.x/6.x
-- **Academic Mentor**: Technical Training Faculty
+``` bash
+g++ -std=c++17 src/main.cpp src/HotelSystem.cpp src/Room.cpp src/Guest.cpp src/Booking.cpp -o hotel
+```
+
+Run:
+
+``` bash
+./hotel
+```
+
+## 13. Example Main Menu
+
+``` text
+===========================================
+       HOTEL BOOKING SYSTEM
+===========================================
+1. Customer Registration
+2. Customer Login
+3. Admin Login
+4. View Available Rooms
+5. Exit
+===========================================
+Enter your choice:
+```
+
+## 14. Testing Performed
+
+The application has been tested for:
+
+-   Displaying available rooms
+-   Customer registration
+-   Customer login
+-   Viewing rooms after login
+-   Creating a room booking
+-   Generating a booking ID
+-   Returning to the customer menu
+-   Exiting the application
+
+Example successful booking:
+
+``` text
+Room Number: 202
+Check-in Date: 2026-10-06
+Check-out Date: 2026-10-08
+Number of Guests: 2
+
+[SUCCESS] Booking created.
+Booking ID: 1000
+Total Amount: $168.00
+```
+
+## 15. Future Enhancements
+
+Possible improvements include:
+
+-   Accurate calculation of nights from check-in/check-out dates
+-   Password hashing and stronger authentication
+-   Database integration using MySQL or SQLite
+-   Online payment support
+-   Graphical or web-based interface
+-   Better input validation
+-   Room search and filtering
+-   Booking reports
+-   Improved invoice generation
+
+## 16. Limitations
+
+-   The application is currently console-based.
+-   Data is stored in local files rather than a database.
+-   Administrator credentials are currently hard-coded.
+-   Date-based night calculation is simplified in the current
+    implementation.
+-   The system is intended for academic/demo use rather than production
+    deployment.
+
+## 17. Project Link
+
+GitHub Repository:
+
+**https://github.com/Tanisha415/hotel-booking-system**
+
+## 18. Conclusion
+
+The Hotel Booking Management System demonstrates how C++ Object-Oriented
+Programming can be used to build a practical hotel management
+application.
+
+The project combines classes, objects, vectors, file handling,
+authentication, room management, booking operations and billing into a
+single console-based system.
+
+It provides a simple foundation that can later be extended with database
+storage, secure authentication, accurate date processing and a graphical
+or web interface.
